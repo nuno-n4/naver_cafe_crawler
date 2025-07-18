@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>네이버 카페 크롤러</title>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: auto; padding: 20px; }
+        .cafe-list { list-style: none; padding: 0; }
+        .cafe-list li { border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; cursor: pointer; }
+        .cafe-list li:hover { background-color: #f0f0f0; }
+        .selected { background-color: #d4edda !important; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>1. 네이버 카페 선택</h1>
+    <p>로그인이 확인되었습니다. 아래는 회원님이 가입한 카페 목록입니다.<br>크롤링할 카페를 선택하고 하단의 '선택' 버튼을 누르세요.</p>
+
+    <form method="POST" id="cafe-form">
+        <h3>내 카페 목록</h3>
+        <ul class="cafe-list">
+            {% for cafe in my_cafes %}
+                <li data-id="{{ cafe.id }}" data-name="{{ cafe.name }}">
+                    <strong>{{ cafe.name }}</strong> (ID: {{ cafe.id }})
+                </li>
+            {% endfor %}
+        </ul>
+        <input type="hidden" name="cafe_id" id="cafe_id">
+        <input type="hidden" name="cafe_name" id="cafe_name">
+        <button type="submit" id="submit-btn" disabled>선택</button>
+    </form>
+
+    <script>
+        const cafeList = document.querySelector('.cafe-list');
+        const cafeIdInput = document.getElementById('cafe_id');
+        const cafeNameInput = document.getElementById('cafe_name');
+        const submitBtn = document.getElementById('submit-btn');
+
+        cafeList.addEventListener('click', (e) => {
+            const li = e.target.closest('li');
+            if (li) {
+                // 모든 선택 해제
+                document.querySelectorAll('.cafe-list li').forEach(item => item.classList.remove('selected'));
+                // 현재 li 선택
+                li.classList.add('selected');
+                // 숨겨진 input에 값 설정
+                cafeIdInput.value = li.dataset.id;
+                cafeNameInput.value = li.dataset.name;
+                // 버튼 활성화
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

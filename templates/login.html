@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>네이버 로그인</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding-top: 50px; }
+        h1 { color: #333; }
+        p { color: #666; }
+        .button {
+            display: inline-block;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #03C75A; /* 네이버 색상 */
+            border: none;
+            border-radius: 10px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .button:hover {
+            background-color: #02B350;
+        }
+        .loading {
+            display: none;
+            margin-top: 20px;
+            font-size: 16px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <h1>네이버 카페 크롤러</h1>
+    <p>진행하려면 네이버 로그인이 필요합니다.</p>
+    <p>아래 버튼을 누르면 네이버 로그인 창이 열립니다.<br>로그인 완료 후, 자동으로 가입된 카페 목록을 불러옵니다.</p>
+    <a href="{{ url_for('fetch_cafes') }}" class="button" onclick="showLoading()">네이버 로그인 및 카페 목록 가져오기</a>
+    <div id="loading" class="loading">
+        <p>브라우저에서 로그인 완료 후, 잠시만 기다려주세요...<br>창을 닫지 마세요.</p>
+    </div>
+
+    <script>
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

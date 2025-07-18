@@ -1,0 +1,8 @@
+flask
+flask-socketio
+celery
+redis
+python-dotenv
+selenium
+webdriver-manager
+requests

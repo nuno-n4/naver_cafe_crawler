@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>크롤링 실행</title>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: auto; padding: 20px; }
+        #progress-log {
+            border: 1px solid #ccc;
+            background-color: #f8f8f8;
+            height: 400px;
+            overflow-y: scroll;
+            padding: 10px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+        }
+    </style>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+</head>
+<body>
+    <h1>2. 기간 설정 및 크롤링 실행</h1>
+    <h2>선택된 카페: {{ cafe_name }} (ID: {{ cafe_id }})</h2>
+
+    <div>
+        <label for="start_date">시작일:</label>
+        <input type="date" id="start_date" name="start_date">
+        <label for="end_date">종료일:</label>
+        <input type="date" id="end_date" name="end_date">
+    </div>
+    <br>
+    <button id="start-button">추출 시작</button>
+
+    <h3>진행 상황</h3>
+    <div id="progress-log">서버로부터의 응답을 기다리는 중...</div>
+
+    <script>
+        // 오늘 날짜를 YYYY-MM-DD 형식으로 가져오기
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('end_date').value = today;
+        
+        // 한달 전 날짜 설정
+        const oneMonthAgo = new Date();
+        oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+        document.getElementById('start_date').value = oneMonthAgo.toISOString().split('T')[0];
+
+        // Socket.IO 연결
+        const socket = io();
+        const startButton = document.getElementById('start-button');
+        const progressLog = document.getElementById('progress-log');
+
+        socket.on('connect', () => {
+            progressLog.innerHTML += '\n서버에 연결되었습니다.';
+        });
+
+        // 서버로부터 진행 상황 메시지를 받으면 로그에 추가
+        socket.on('progress_update', (data) => {
+            progressLog.innerHTML += `\n[진행] ${data.message}`;
+            progressLog.scrollTop = progressLog.scrollHeight; // 자동 스크롤
+        });
+
+        // 작업 시작 응답을 받으면 처리
+        socket.on('task_response', (data) => {
+            progressLog.innerHTML += `\n[시스템] ${data.status}`;
+            progressLog.scrollTop = progressLog.scrollHeight;
+        });
+
+        // 버튼 클릭 이벤트
+        startButton.addEventListener('click', () => {
+            const cafeId = "{{ cafe_id }}";
+            const startDate = document.getElementById('start_date').value;
+            const endDate = document.getElementById('end_date').value;
+
+            if (!startDate || !endDate) {
+                alert('시작일과 종료일을 모두 선택해주세요.');
+                return;
+            }
+
+            startButton.disabled = true;
+            startButton.innerText = '크롤링 진행 중...';
+            
+            // 서버로 'start_scrape_task' 이벤트를 보냄
+            socket.emit('start_scrape_task', {
+                'cafe_id': cafeId,
+                'start_date': startDate,
+                'end_date': endDate
+            });
+        });
+    </script>
+</body>
+</html>
